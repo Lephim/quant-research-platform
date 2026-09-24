@@ -1,0 +1,13 @@
+              Optimizer - 0 bps  Optimizer - 10 bps  Equal Weight - 0 bps  \
+Total Return           6.801661            6.737054              6.848305   
+CAGR                   0.409588            0.407631              0.410993   
+Volatility             0.313447            0.313461              0.298056   
+Sharpe                 1.252737            1.248257              1.305174   
+Max Drawdown          -0.471992           -0.473138             -0.416108   
+
+              Equal Weight - 10 bps  
+Total Return               6.836013  
+CAGR                       0.410624  
+Volatility                 0.298059  
+Sharpe                     1.304286  
+Max Drawdown              -0.416329  

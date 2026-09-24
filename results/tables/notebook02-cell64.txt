@@ -1,0 +1,13 @@
+              Historical μ + Sample Σ  Historical μ + LW Σ  Shrunk μ + LW Σ  \
+Total Return                 6.801658             6.875383         5.500719   
+CAGR                         0.409588             0.411805         0.367266   
+Volatility                   0.313447             0.313593         0.280710   
+Sharpe                       1.252736             1.257319         1.255339   
+Max Drawdown                -0.471992            -0.471465        -0.321051   
+
+              Equal Weight  
+Total Return      6.848304  
+CAGR              0.410993  
+Volatility        0.298056  
+Sharpe            1.305174  
+Max Drawdown     -0.416108  
