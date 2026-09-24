@@ -1,0 +1,9 @@
+## Current capabilities
+
+### Market Data
+✓ Historical market data ingestion
+
+### Analytics
+✓ Simple returns
+✓ Log returns
+✓ Annualized volatility

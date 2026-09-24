@@ -1,6 +1,8 @@
+from analytics import returns
 import numpy as np
+import pandas as pd
 
-
+TRADING_DAYS = 252
 def annualized_volatility(returns):
     """
     Calculate annualized volatility.
@@ -8,11 +10,8 @@ def annualized_volatility(returns):
     Assumes 252 trading days/year.
     """
 
-    volatility = returns.std()
+    return returns.std() * np.sqrt(TRADING_DAYS)
 
-    annualized = volatility * np.sqrt(252)
-
-    return annualized
 def sharpe_ratio(
     returns,
     risk_free_rate=0
@@ -43,3 +42,21 @@ def maximum_drawdown(prices):
     ) / running_max
 
     return drawdown.min()
+
+def rolling_volatility(
+    returns,
+    window=30
+):
+    """
+    Calculate rolling annualized volatility.
+    """
+
+    rolling_vol = (
+        returns
+        .rolling(window)
+        .std()
+        *
+        np.sqrt(TRADING_DAYS)
+    )
+
+    return rolling_vol
