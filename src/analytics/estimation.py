@@ -77,10 +77,8 @@ def shrink_expected_returns(
     )
 
     # How much to trust each asset's own estimate
-    weights = (
-        tau_squared
-        / (tau_squared + standard_errors ** 2)
-    )
+    denominator = tau_squared + standard_errors ** 2
+    weights = (tau_squared / denominator.replace(0, np.nan)).fillna(0.0)
 
     # Shrink toward common mean
     shrunk_mu = (

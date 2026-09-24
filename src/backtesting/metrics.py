@@ -2,8 +2,7 @@ import numpy as np
 
 from analytics.risk import (
     annualized_volatility,
-    sharpe_ratio,
-    maximum_drawdown
+    sharpe_ratio
 )
 
 TRADING_DAYS = 252
@@ -11,6 +10,9 @@ TRADING_DAYS = 252
 
 def performance_metrics(returns, risk_free_rate=0.0):
     returns = returns.dropna()
+
+    if returns.empty:
+        raise ValueError("returns must contain at least one observation")
 
     n_days = len(returns)
     years = n_days / TRADING_DAYS
@@ -27,7 +29,8 @@ def performance_metrics(returns, risk_free_rate=0.0):
     )
 
     wealth = (1 + returns).cumprod()
-    max_drawdown = maximum_drawdown(wealth)
+    # Include starting wealth: a loss on the first day is a drawdown too.
+    max_drawdown = (wealth / wealth.cummax().clip(lower=1.0) - 1).min()
 
     return {
         "Total Return": total_return,

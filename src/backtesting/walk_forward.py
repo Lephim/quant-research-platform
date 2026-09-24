@@ -19,28 +19,10 @@ def walk_forward_backtest(
     transaction_cost_bps=0.0,
     evaluation_start=None
 ):
-    returns = returns.dropna()
-    if evaluation_start is not None:
-        evaluation_start = pd.Timestamp(evaluation_start)
-
-        eligible_positions = np.where(
-            returns.index >= evaluation_start
-        )[0]
-
-        if len(eligible_positions) == 0:
-            raise ValueError(
-                "evaluation_start is after the available data"
-            )
-
-        first_test_position = eligible_positions[0]
-
-        if first_test_position < train_window:
-            raise ValueError(
-                "Not enough historical data before evaluation_start "
-                "for the requested train_window"
-            )
-    else:
-        first_test_position = train_window
+    returns, first_test_position = _prepare_returns(
+        returns, train_window, rebalance_frequency,
+        transaction_cost_bps, evaluation_start
+    )
 
     portfolio_returns = []
     weights_history = []
@@ -101,7 +83,9 @@ def walk_forward_backtest(
         )
 
         if not result.success:
-            continue
+            raise RuntimeError(
+                f"Optimization failed at {test.index[0]}: {result.message}"
+            )
 
         weights = result.x
 
@@ -156,9 +140,13 @@ def equal_weight_backtest(
     returns,
     train_window=252,
     rebalance_frequency=21,
-    transaction_cost_bps=0.0
+    transaction_cost_bps=0.0,
+    evaluation_start=None
 ):
-    returns = returns.dropna()
+    returns, first_test_position = _prepare_returns(
+        returns, train_window, rebalance_frequency,
+        transaction_cost_bps, evaluation_start
+    )
 
     portfolio_returns = []
     weights_history = []
@@ -173,7 +161,7 @@ def equal_weight_backtest(
     previous_end_weights = None
 
     for start in range(
-        train_window,
+        first_test_position,
         len(returns),
         rebalance_frequency
     ):
@@ -246,3 +234,37 @@ def holding_period_returns(test_returns, initial_weights):
     )
 
     return portfolio_returns
+
+
+def _prepare_returns(returns, train_window, rebalance_frequency,
+                     transaction_cost_bps, evaluation_start):
+    """Validate daily simple returns and select a common out-of-sample start."""
+    if not isinstance(returns, pd.DataFrame) or returns.shape[1] == 0:
+        raise ValueError("returns must be a DataFrame with asset columns")
+    if not isinstance(returns.index, pd.DatetimeIndex):
+        raise ValueError("returns must have a DatetimeIndex")
+    if not returns.index.is_monotonic_increasing or not returns.index.is_unique:
+        raise ValueError("return dates must be sorted and unique")
+    if returns.index.hasnans or not returns.columns.is_unique:
+        raise ValueError("dates must be valid and asset columns unique")
+    for name, value, minimum in (("train_window", train_window, 2),
+                                 ("rebalance_frequency", rebalance_frequency, 1)):
+        if isinstance(value, bool) or not isinstance(value, (int, np.integer)) or value < minimum:
+            raise ValueError(f"{name} must be an integer >= {minimum}")
+    if not np.isfinite(transaction_cost_bps) or not 0 <= transaction_cost_bps < 10_000:
+        raise ValueError("transaction_cost_bps must be finite and in [0, 10000)")
+    returns = returns.dropna()
+    if not np.isfinite(returns.to_numpy()).all() or (returns <= -1).any().any():
+        raise ValueError("returns must be finite and greater than -1")
+    if evaluation_start is None:
+        first = train_window
+    else:
+        date = pd.Timestamp(evaluation_start)
+        if pd.isna(date):
+            raise ValueError("evaluation_start must be a valid date")
+        first = int(returns.index.searchsorted(date))
+    if first < train_window:
+        raise ValueError("Not enough historical data before evaluation_start for the requested train_window")
+    if first >= len(returns):
+        raise ValueError("No evaluation observations after the training window/evaluation_start")
+    return returns, first

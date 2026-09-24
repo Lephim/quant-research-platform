@@ -3,6 +3,15 @@ from scipy.optimize import minimize
 from analytics.portfolio import portfolio_volatility
 
 
+def _validate_cap(n_assets, max_weight):
+    if not isinstance(n_assets, (int, np.integer)) or n_assets < 1:
+        raise ValueError("n_assets must be a positive integer")
+    if not np.isfinite(max_weight) or not 0 < max_weight <= 1:
+        raise ValueError("max_weight must be finite and in (0, 1]")
+    if n_assets * max_weight < 1 - 1e-12:
+        raise ValueError("max_weight cannot support a fully invested portfolio")
+
+
 def random_weights(n_assets):
     """
     Generate random portfolio weights.
@@ -28,12 +37,16 @@ def random_weights_constrained(
     n_assets,
     max_weight=0.30
 ):
-    while True:
+    _validate_cap(n_assets, max_weight)
+    if np.isclose(n_assets * max_weight, 1.0, rtol=0, atol=1e-12):
+        return np.ones(n_assets) / n_assets
+    for _ in range(100_000):
         weights = np.random.random(n_assets)
         weights /= weights.sum()
 
         if np.all(weights <= max_weight):
             return weights
+    raise RuntimeError("Rejection sampler exhausted; relax the weight cap")
 
 def portfolio_sharpe(
     weights,
@@ -109,6 +122,7 @@ def optimize_max_sharpe(
     """
 
     n_assets = len(expected_returns)
+    _validate_cap(n_assets, max_weight)
 
     # Start from an equally weighted portfolio
     initial_weights = np.ones(n_assets) / n_assets
@@ -145,6 +159,7 @@ def optimize_min_volatility(
     max_weight=0.30
 ):
     n_assets = len(covariance_matrix)
+    _validate_cap(n_assets, max_weight)
 
     initial_weights = np.ones(n_assets) / n_assets
 
@@ -176,6 +191,7 @@ def optimize_for_target_return(
     max_weight=0.30
 ):
     n_assets = len(expected_returns)
+    _validate_cap(n_assets, max_weight)
 
     initial_weights = np.ones(n_assets) / n_assets
 

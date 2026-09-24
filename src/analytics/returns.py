@@ -13,7 +13,7 @@ def calculate_simple_returns(prices):
         pandas Series or DataFrame
     """
 
-    returns = prices.pct_change()
+    returns = prices.pct_change(fill_method=None)
 
     return returns
 
