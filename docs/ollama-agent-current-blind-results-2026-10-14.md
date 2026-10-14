@@ -1,0 +1,17 @@
+# Current snapshot-backed Ollama agent: held-out check
+
+This is a new evaluation of the runner's comparison guard, separate from the original 10/12 report. The [prospective plan](ollama-agent-current-blind-plan-2026-10-14.md) and `src/agent/current_agent_cases.py` were saved before the first model call. The case-file SHA-256 is `18f5b185517f3fecbd8dd7f9a142e224594119a42ea687f9d91317f7e14dedb0`; the verified 2018–2024 multi-asset snapshot SHA-256 is `d87df74b9c463a5e7a82ebe66634b9025578f8451c372f80390f387fc9ef9d10`. The [full JSON report](../results/tables/ollama_agent_current_blind_2026-10-14.json) records every prompt, attempted tool call, response, error, and elapsed time. The model was local `qwen3:8b`; backtest metrics were canned. No market data was downloaded.
+
+**Primary strict score: 5/8.** The covariance pair, mean-estimator pair, and all three no-tool guard cases passed. The other three comparison cases failed for different reasons:
+
+- **Window pair:** the model ran only 252 observations and omitted 504. The runner returned `Comparison incomplete` and showed no partial metrics. This is a successful suppression of an incomplete experiment, but the requested experiment did not complete.
+- **Three-value cost sweep:** the model completed 25 and 10 bps, then attempted 0 bps with a malformed `cov,ariance_method` key. After that tool error, it retried 0 bps correctly. The final answer showed the three requested values and the snapshot checksum. The strict score counts every attempted tool call, so the malformed extra attempt fails even though the displayed comparison was complete. The harness records proposed calls before parameter validation; `actual_calls` therefore includes the rejected call.
+- **Four-arm covariance-by-mean grid:** the model made all four requested effective calls with matched settings. The runner nevertheless returned `Comparison incomplete: requested configurations 2, completed distinct configurations 2; missing []` and hid all results. Its `_comparison_dimensions` recognizes `historical means` and `shrunk means` separately, but the prompt says `historical versus shrunk means`. It detected only the covariance dimension, then treated the four valid runs as duplicates across that dimension. This is a comparison-parser false rejection and a misleading error count.
+
+The final no-tool cases executed no backtests. All successful tool calls in a case shared the same loaded return-series object. The primary run completed without an Ollama transport error. Latency and per-case details are in the JSON report.
+
+## Interpretation and next repair
+
+The guard prevented a partial window result from being presented as a comparison. It did not make the missing model call, and its natural-language dimension parser falsely rejected a valid four-arm grid. The cost sweep shows that the model can still emit malformed tool arguments before recovery. This eight-case check is too small to estimate general reliability, and canned metrics do not validate portfolio performance.
+
+The next engineering repair should use a structured comparison specification to define expected arms before running tools, then reconcile completed arms against that specification. At minimum, fix the multi-dimension parser and its `missing []` error, add a regression case for the four-arm prompt, and distinguish rejected tool attempts from completed backtests in evaluation reports. Freeze a new case set before rerunning any post-fix live evaluation; do not overwrite either existing blind report.

@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "snapshot_path": "/Users/himankarsharma/Documents/quant-research-platform/data/snapshots/multi_asset_2018-2024_2026-10-14.csv",
+  "snapshot_sha256": "d87df74b9c463a5e7a82ebe66634b9025578f8451c372f80390f387fc9ef9d10",
+  "universe": "multi_asset",
+  "windows": [
+    126,
+    252,
+    504,
+    756
+  ],
+  "frequencies": [
+    5,
+    21,
+    63
+  ],
+  "expected_return_method": "historical",
+  "max_weight": 0.3,
+  "transaction_cost_bps": 10,
+  "evaluation_start": "2021-01-05",
+  "evaluation_end": "2024-12-31",
+  "evaluation_days": 1004,
+  "runs": 24,
+  "results_csv_sha256": "2c0664ff5877be46e546614360d4190ffe5de03d32d4a5b4c09ea5056240b339"
+}

@@ -1,0 +1,334 @@
+{
+  "model": "qwen3:8b",
+  "started_at_utc": "2026-10-14T12:39:40.259073+00:00",
+  "cases": [
+    {
+      "id": "paraphrased_pair",
+      "question": "For the diversified ETF basket, compare ordinary sample covariance with Ledoit-Wolf shrinkage. Use historical mean returns, a 504-day lookback, trade every 63 observations, cap positions at 30%, and charge 10 basis points per unit of turnover.",
+      "expected_calls": [
+        {
+          "universe": "multi_asset",
+          "expected_return_method": "historical",
+          "train_window": 504,
+          "rebalance_frequency": 63,
+          "max_weight": 0.3,
+          "transaction_cost_bps": 10.0,
+          "covariance_method": "sample"
+        },
+        {
+          "universe": "multi_asset",
+          "expected_return_method": "historical",
+          "train_window": 504,
+          "rebalance_frequency": 63,
+          "max_weight": 0.3,
+          "transaction_cost_bps": 10.0,
+          "covariance_method": "ledoit_wolf"
+        }
+      ],
+      "actual_calls": [
+        {
+          "transaction_cost_bps": 10,
+          "universe": "equity",
+          "covariance_method": "sample",
+          "expected_return_method": "historical",
+          "train_window": 504,
+          "rebalance_frequency": 63,
+          "max_weight": 0.3
+        },
+        {
+          "transaction_cost_bps": 10,
+          "universe": "equity",
+          "covariance_method": "ledoit_wolf",
+          "expected_return_method": "historical",
+          "train_window": 504,
+          "rebalance_frequency": 63,
+          "max_weight": 0.3
+        }
+      ],
+      "answer": "Backtest results (values reported directly by the engine):\n\nRun 1: equity\n  covariance_method: sample\n  expected_return_method: historical\n  train_window: 504\n  rebalance_frequency: 63\n  max_weight: 0.3\n  transaction_cost_bps: 10.0\n  Sharpe: 0.5\n  CAGR: 0.05\n\nRun 2: equity\n  covariance_method: ledoit_wolf\n  expected_return_method: historical\n  train_window: 504\n  rebalance_frequency: 63\n  max_weight: 0.3\n  transaction_cost_bps: 10.0\n  Sharpe: 0.52\n  CAGR: 0.05\n\nThese historical results are descriptive, not a significance test. The selected universe and provider data limit interpretation.",
+      "error": null,
+      "elapsed_seconds": 93.049,
+      "calls_match": false,
+      "response_match": true,
+      "passed": false
+    },
+    {
+      "id": "incomplete_request",
+      "question": "Run a backtest.",
+      "expected_calls": [],
+      "actual_calls": [
+        {
+          "max_weight": 0.3,
+          "rebalance_frequency": 21,
+          "train_window": 252,
+          "transaction_cost_bps": 10,
+          "universe": "equity",
+          "covariance_method": "ledoit_wolf",
+          "expected_return_method": "shrunk"
+        }
+      ],
+      "answer": "Backtest results (values reported directly by the engine):\n\nRun 1: equity\n  covariance_method: ledoit_wolf\n  expected_return_method: shrunk\n  train_window: 252\n  rebalance_frequency: 21\n  max_weight: 0.3\n  transaction_cost_bps: 10.0\n  Sharpe: 0.5\n  CAGR: 0.05\n\nThese historical results are descriptive, not a significance test. The selected universe and provider data limit interpretation.",
+      "error": null,
+      "elapsed_seconds": 34.286,
+      "calls_match": false,
+      "response_match": false,
+      "passed": false
+    },
+    {
+      "id": "invalid_window",
+      "question": "Run a multi_asset backtest with sample covariance, historical returns, a 999-observation training window, 63-observation rebalancing, 0.30 max weight, and 10 bps cost.",
+      "expected_calls": [],
+      "actual_calls": [
+        {
+          "covariance_method": "sample",
+          "expected_return_method": "historical",
+          "max_weight": 0.3,
+          "rebalance_frequency": 63,
+          "train_window": 756,
+          "transaction_cost_bps": 10,
+          "universe": "multi_asset"
+        }
+      ],
+      "answer": "Backtest results (values reported directly by the engine):\n\nRun 1: multi_asset\n  covariance_method: sample\n  expected_return_method: historical\n  train_window: 756\n  rebalance_frequency: 63\n  max_weight: 0.3\n  transaction_cost_bps: 10.0\n  Sharpe: 0.5\n  CAGR: 0.05\n\nThese historical results are descriptive, not a significance test. The selected universe and provider data limit interpretation.",
+      "error": null,
+      "elapsed_seconds": 128.105,
+      "calls_match": false,
+      "response_match": false,
+      "passed": false
+    },
+    {
+      "id": "three_arm_comparison",
+      "question": "Run exactly three multi_asset experiments: sample covariance with historical expected returns; Ledoit-Wolf covariance with historical expected returns; and Ledoit-Wolf covariance with shrunk expected returns. For each experiment use 504 training observations, 63-observation rebalancing, a 0.30 weight cap, and 10 bps cost.",
+      "expected_calls": [
+        {
+          "universe": "multi_asset",
+          "expected_return_method": "historical",
+          "train_window": 504,
+          "rebalance_frequency": 63,
+          "max_weight": 0.3,
+          "transaction_cost_bps": 10.0,
+          "covariance_method": "sample"
+        },
+        {
+          "universe": "multi_asset",
+          "expected_return_method": "historical",
+          "train_window": 504,
+          "rebalance_frequency": 63,
+          "max_weight": 0.3,
+          "transaction_cost_bps": 10.0,
+          "covariance_method": "ledoit_wolf"
+        },
+        {
+          "universe": "multi_asset",
+          "expected_return_method": "shrunk",
+          "train_window": 504,
+          "rebalance_frequency": 63,
+          "max_weight": 0.3,
+          "transaction_cost_bps": 10.0,
+          "covariance_method": "ledoit_wolf"
+        }
+      ],
+      "actual_calls": [
+        {
+          "train_window": 504,
+          "rebalance_frequency": 63,
+          "max_weight": 0.3,
+          "transaction_cost_bps": 10,
+          "universe": "multi_asset",
+          "covariance_method": "sample",
+          "expected_return_method": "historical"
+        },
+        {
+          "expected_return_method": "historical",
+          "train_window": 504,
+          "rebalance_frequency": 63,
+          "max_weight": 0.3,
+          "transaction_cost_bps": 10,
+          "universe": "multi_asset",
+          "covariance_method": "ledoit_wolf"
+        },
+        {
+          "expected_return_method": "shrunk",
+          "train_window": 504,
+          "rebalance_frequency": 63,
+          "max_weight": 0.3,
+          "transaction_cost_bps": 10,
+          "universe": "multi_asset",
+          "covariance_method": "ledoit_wolf"
+        }
+      ],
+      "answer": "Backtest results (values reported directly by the engine):\n\nRun 1: multi_asset\n  covariance_method: sample\n  expected_return_method: historical\n  train_window: 504\n  rebalance_frequency: 63\n  max_weight: 0.3\n  transaction_cost_bps: 10.0\n  Sharpe: 0.5\n  CAGR: 0.05\n\nRun 2: multi_asset\n  covariance_method: ledoit_wolf\n  expected_return_method: historical\n  train_window: 504\n  rebalance_frequency: 63\n  max_weight: 0.3\n  transaction_cost_bps: 10.0\n  Sharpe: 0.52\n  CAGR: 0.05\n\nRun 3: multi_asset\n  covariance_method: ledoit_wolf\n  expected_return_method: shrunk\n  train_window: 504\n  rebalance_frequency: 63\n  max_weight: 0.3\n  transaction_cost_bps: 10.0\n  Sharpe: 0.5\n  CAGR: 0.05\n\nThese historical results are descriptive, not a significance test. The selected universe and provider data limit interpretation.",
+      "error": null,
+      "elapsed_seconds": 63.259,
+      "calls_match": true,
+      "response_match": true,
+      "passed": true
+    },
+    {
+      "id": "concept_no_tool",
+      "question": "Explain conceptually what portfolio turnover means. Do not run a backtest.",
+      "expected_calls": [],
+      "actual_calls": [],
+      "answer": "Portfolio turnover refers to the frequency at which assets in a portfolio are bought and sold over a specific period, typically measured as a percentage of the portfolio's total value. It reflects the degree of trading activity within the portfolio. \n\n**Conceptual Breakdown:**\n1. **High Turnover**: Indicates frequent trading (e.g., active management, market timing). This can lead to higher transaction costs, tax liabilities, and potential performance drag from short-term market noise. It may signal strategies like momentum trading or sector rotation.\n2. **Low Turnover**: Suggests a more static, long-term approach (e.g., index funds, buy-and-hold strategies). This reduces costs and tax impacts but may miss opportunities if market conditions shift.\n3. **Implications**: Turnover is a trade-off between capturing market movements and minimizing frictional costs. High turnover can erode returns, while low turnover may underperform in volatile markets. It also relates to the fund's strategy (active vs. passive) and the manager's style.\n\nTurnover is critical for investors to assess a fund's efficiency and alignment with their goals, but it should be analyzed alongside other metrics like fees and risk-adjusted returns.",
+      "error": null,
+      "elapsed_seconds": 42.654,
+      "calls_match": true,
+      "response_match": true,
+      "passed": true
+    },
+    {
+      "id": "repeat_pair_1",
+      "question": "Compare sample and Ledoit-Wolf covariance in multi_asset. Use historical expected returns, 504 training observations, 63-observation rebalancing, a 0.30 weight cap, and 10 basis points of transaction cost for each run.",
+      "expected_calls": [
+        {
+          "universe": "multi_asset",
+          "expected_return_method": "historical",
+          "train_window": 504,
+          "rebalance_frequency": 63,
+          "max_weight": 0.3,
+          "transaction_cost_bps": 10.0,
+          "covariance_method": "sample"
+        },
+        {
+          "universe": "multi_asset",
+          "expected_return_method": "historical",
+          "train_window": 504,
+          "rebalance_frequency": 63,
+          "max_weight": 0.3,
+          "transaction_cost_bps": 10.0,
+          "covariance_method": "ledoit_wolf"
+        }
+      ],
+      "actual_calls": [
+        {
+          "transaction_cost_bps": 10,
+          "universe": "multi_asset",
+          "covariance_method": "sample",
+          "expected_return_method": "historical",
+          "max_weight": 0.3,
+          "rebalance_frequency": 63,
+          "train_window": 504
+        },
+        {
+          "max_weight": 0.3,
+          "rebalance_frequency": 63,
+          "train_window": 504,
+          "transaction_cost_bps": 10,
+          "universe": "multi_asset",
+          "covariance_method": "ledoit_wolf",
+          "expected_return_method": "historical"
+        }
+      ],
+      "answer": "Backtest results (values reported directly by the engine):\n\nRun 1: multi_asset\n  covariance_method: sample\n  expected_return_method: historical\n  train_window: 504\n  rebalance_frequency: 63\n  max_weight: 0.3\n  transaction_cost_bps: 10.0\n  Sharpe: 0.5\n  CAGR: 0.05\n\nRun 2: multi_asset\n  covariance_method: ledoit_wolf\n  expected_return_method: historical\n  train_window: 504\n  rebalance_frequency: 63\n  max_weight: 0.3\n  transaction_cost_bps: 10.0\n  Sharpe: 0.52\n  CAGR: 0.05\n\nThese historical results are descriptive, not a significance test. The selected universe and provider data limit interpretation.",
+      "error": null,
+      "elapsed_seconds": 49.945,
+      "calls_match": true,
+      "response_match": true,
+      "passed": true
+    },
+    {
+      "id": "repeat_pair_2",
+      "question": "Compare sample and Ledoit-Wolf covariance in multi_asset. Use historical expected returns, 504 training observations, 63-observation rebalancing, a 0.30 weight cap, and 10 basis points of transaction cost for each run.",
+      "expected_calls": [
+        {
+          "universe": "multi_asset",
+          "expected_return_method": "historical",
+          "train_window": 504,
+          "rebalance_frequency": 63,
+          "max_weight": 0.3,
+          "transaction_cost_bps": 10.0,
+          "covariance_method": "sample"
+        },
+        {
+          "universe": "multi_asset",
+          "expected_return_method": "historical",
+          "train_window": 504,
+          "rebalance_frequency": 63,
+          "max_weight": 0.3,
+          "transaction_cost_bps": 10.0,
+          "covariance_method": "ledoit_wolf"
+        }
+      ],
+      "actual_calls": [
+        {
+          "transaction_cost_bps": 10,
+          "universe": "multi_asset",
+          "covariance_method": "sample",
+          "expected_return_method": "historical",
+          "max_weight": 0.3,
+          "rebalance_frequency": 63,
+          "train_window": 504
+        },
+        {
+          "covariance_method": "ledoit_wolf",
+          "expected_return_method": "historical",
+          "max_weight": 0.3,
+          "rebalance_frequency": 63,
+          "train_window": 504,
+          "transaction_cost_bps": 10,
+          "universe": "multi_asset"
+        }
+      ],
+      "answer": "Backtest results (values reported directly by the engine):\n\nRun 1: multi_asset\n  covariance_method: sample\n  expected_return_method: historical\n  train_window: 504\n  rebalance_frequency: 63\n  max_weight: 0.3\n  transaction_cost_bps: 10.0\n  Sharpe: 0.5\n  CAGR: 0.05\n\nRun 2: multi_asset\n  covariance_method: ledoit_wolf\n  expected_return_method: historical\n  train_window: 504\n  rebalance_frequency: 63\n  max_weight: 0.3\n  transaction_cost_bps: 10.0\n  Sharpe: 0.52\n  CAGR: 0.05\n\nThese historical results are descriptive, not a significance test. The selected universe and provider data limit interpretation.",
+      "error": null,
+      "elapsed_seconds": 51.36,
+      "calls_match": true,
+      "response_match": true,
+      "passed": true
+    },
+    {
+      "id": "repeat_pair_3",
+      "question": "Compare sample and Ledoit-Wolf covariance in multi_asset. Use historical expected returns, 504 training observations, 63-observation rebalancing, a 0.30 weight cap, and 10 basis points of transaction cost for each run.",
+      "expected_calls": [
+        {
+          "universe": "multi_asset",
+          "expected_return_method": "historical",
+          "train_window": 504,
+          "rebalance_frequency": 63,
+          "max_weight": 0.3,
+          "transaction_cost_bps": 10.0,
+          "covariance_method": "sample"
+        },
+        {
+          "universe": "multi_asset",
+          "expected_return_method": "historical",
+          "train_window": 504,
+          "rebalance_frequency": 63,
+          "max_weight": 0.3,
+          "transaction_cost_bps": 10.0,
+          "covariance_method": "ledoit_wolf"
+        }
+      ],
+      "actual_calls": [
+        {
+          "covariance_method": "sample",
+          "expected_return_method": "historical",
+          "train_window": 504,
+          "rebalance_frequency": 63,
+          "max_weight": 0.3,
+          "transaction_cost_bps": 10,
+          "universe": "multi_asset"
+        },
+        {
+          "expected_return_method": "historical",
+          "train_window": 504,
+          "rebalance_frequency": 63,
+          "max_weight": 0.3,
+          "transaction_cost_bps": 10,
+          "universe": "multi_asset",
+          "covariance_method": "ledoit_wolf"
+        }
+      ],
+      "answer": "Backtest results (values reported directly by the engine):\n\nRun 1: multi_asset\n  covariance_method: sample\n  expected_return_method: historical\n  train_window: 504\n  rebalance_frequency: 63\n  max_weight: 0.3\n  transaction_cost_bps: 10.0\n  Sharpe: 0.5\n  CAGR: 0.05\n\nRun 2: multi_asset\n  covariance_method: ledoit_wolf\n  expected_return_method: historical\n  train_window: 504\n  rebalance_frequency: 63\n  max_weight: 0.3\n  transaction_cost_bps: 10.0\n  Sharpe: 0.52\n  CAGR: 0.05\n\nThese historical results are descriptive, not a significance test. The selected universe and provider data limit interpretation.",
+      "error": null,
+      "elapsed_seconds": 60.793,
+      "calls_match": true,
+      "response_match": true,
+      "passed": true
+    }
+  ],
+  "complete": true,
+  "finished_at_utc": "2026-10-14T12:48:23.732524+00:00",
+  "passed": 5,
+  "total": 8
+}

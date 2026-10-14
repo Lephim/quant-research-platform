@@ -2,7 +2,7 @@
 
 A Python research framework for studying how estimation uncertainty affects constrained portfolio optimization out of sample. It combines sample and Ledoit–Wolf covariance estimation, expected-return shrinkage, rolling walk-forward evaluation, portfolio drift, turnover, transaction costs, and an equal-weight benchmark.
 
-**v0.1 scope:** a research engine with offline regression tests and preserved exploratory notebooks. The diversified ETF experiment, agentic research layer, and agent evaluation are planned work, not implemented capabilities.
+**v0.1 scope:** a research engine with offline regression tests and preserved exploratory notebooks. The local Ollama agent uses checksum-verified price snapshots; its evaluated limitations are documented below.
 
 ## Research question
 
@@ -52,13 +52,78 @@ Start with [methodology](docs/methodology.md), then the [notebook guide](noteboo
 
 Tests cover return calculations, covariance scaling, shrinkage, weight constraints, buy-and-hold drift, turnover/cost accounting, training-only estimation, common evaluation dates, optimizer failure, and initial-wealth drawdown. CI runs tests and the synthetic example on Python 3.11 and 3.12; remote CI status is not claimed until it runs.
 
-Market datasets are not committed. The loader currently inherits yfinance defaults, and downloads can change as provider data is revised. Preserve explicit adjustment settings, download time, versions, and a data checksum in future empirical runs. See [methodology](docs/methodology.md) for the execution and cost-model limitations.
+Market datasets are not committed. The loader explicitly requests adjusted prices, but downloads can change as provider data is revised. The new local multi-asset snapshot records adjustment settings, download time, versions, and a checksum. See [methodology](docs/methodology.md) for the execution and cost-model limitations.
 
 ## Next milestones
 
-1. Create a clean reproducible research entry point with cached, versioned inputs and explicit download settings.
-2. Complete and export training-window and frequency comparisons over identical evaluation dates.
-3. Add a diversified ETF experiment with documented universe selection and inception dates.
-4. Publish a research report, then build the agentic research layer and evaluate numerical faithfulness, tool choice, unsupported claims, cost, and latency.
+1. Extend the local snapshot workflow to other research universes and document selection and inception dates.
+2. Add uncertainty analysis and an independent holdout before claiming estimator superiority.
+3. Evaluate the Ollama agent's tool choice, numerical faithfulness, unsupported claims, cost, and latency.
 
 See the [v0.1 review plan](docs/v0.1-review.md). A license has not been selected; no open-source license is implied.
+
+## Local Ollama research agent
+
+The agent in `src/agent` calls the existing walk-forward engine using a selected,
+checksum-verified price snapshot. Every tool call in one session uses the same
+return series, and the output names the snapshot and its SHA-256. It does not
+fetch fresh market data. From the repository root, with Ollama running and a
+locally installed tool-capable model:
+
+```bash
+python -m pip install -e .
+python -m agent.runner --snapshot data/snapshots/multi_asset_2018-2024_2026-10-14.csv --model qwen3:8b "Compare sample and Ledoit-Wolf covariance in the multi_asset universe with historical means, 504 training observations, 63-observation rebalancing, 30% max weight, and 10 bps cost."
+```
+
+Set `RESEARCH_SNAPSHOT` to use a snapshot without repeating `--snapshot`,
+`OLLAMA_MODEL` to choose the model, and `OLLAMA_HOST` to change its local endpoint.
+The snapshot CSV and its `.csv.json` manifest must remain together. A request
+for an incompatible universe stops before any backtest runs. Each command starts
+a fresh agent session, so it cannot refer to earlier terminal results as
+“the same configurations.”
+
+For a controlled covariance pair without model-chosen parameters, run:
+
+```bash
+python -m agent.runner --snapshot data/snapshots/multi_asset_2018-2024_2026-10-14.csv --compare-covariance --universe multi_asset --expected-return-method historical --train-window 504 --rebalance-frequency 63 --max-weight 0.3 --transaction-cost-bps 10
+```
+
+The [held-out agent evaluation](docs/ollama-agent-snapshot-blind-results-2026-10-14.md)
+records both correct calls and incomplete comparisons. Inspect all displayed
+settings and run counts before drawing research conclusions.
+The runner checks explicitly requested comparison arms against the completed
+runs. For one comparison dimension, or an explicit request for all combinations,
+it fills missing arms using the same verified snapshot and fixed settings. It
+reports any remaining missing, unexpected, or duplicate runs without displaying
+a partial comparison. See the [post-fix live check](docs/ollama-agent-post-fix-results-2026-10-14.md)
+for observed behavior and limits.
+
+## Reproducible multi-asset robustness run
+
+The [14 October 2026 research note](docs/multi-asset-robustness-2026-10-14.md)
+records a checksum-verified local ETF price snapshot and a 24-run covariance
+grid on one common evaluation period. The snapshot is in the ignored `data/`
+directory; keep its CSV and JSON manifest together. The grid results and
+provenance are in `results/tables/`.
+
+To repeat the grid without another download:
+
+```bash
+python -m research.robustness run --snapshot data/snapshots/multi_asset_2018-2024_2026-10-14.csv --output results/tables/multi_asset_covariance_grid_recheck.csv
+```
+
+Use a fresh output filename because the runner refuses to overwrite results.
+
+## 2025-onward holdout and agent check
+
+The [fixed holdout plan](docs/multi-asset-holdout-plan-2026-10-14.md) was saved
+before downloading 2025-onward prices. The [results](docs/multi-asset-holdout-results-2026-10-14.md)
+compare Ledoit–Wolf, sample covariance, and equal weight on matching dates.
+The [local Ollama evaluation](docs/ollama-agent-evaluation-2026-10-14.md)
+records two offline tool-choice cases. These reports are descriptive and do not
+claim statistical significance or general model reliability.
+
+The [expanded Ollama evaluation](docs/ollama-agent-expanded-evaluation-results-2026-10-14.md)
+records eight fixed tool-choice cases, the initial failures, and the guarded
+rerun. The guards prevent the tested incomplete and unsupported requests from
+executing a backtest.

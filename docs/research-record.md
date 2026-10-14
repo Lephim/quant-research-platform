@@ -14,8 +14,8 @@ The [0/10 bps comparison](../results/tables/notebook02-cell84.txt) and [0–50 b
 
 ## Training windows and frequency
 
-Cell 90 saves a 126/252/504/756-observation sweep with different evaluation starts; it is not evidence of a preferred training window. Cell 91 saves `2021-01-05` as the common start and cell 92 defines the aligned comparison, but cell 92 has no saved results. The referenced ChatGPT conversation supplies later aligned-window and frequency results; these have not been independently reproduced or exported as repository results here.
+Cell 90 saves a 126/252/504/756-observation sweep with different evaluation starts; it is not evidence of a preferred training window. Cell 91 saves `2021-01-05` as the common start and cell 92 defines the aligned comparison, but cell 92 has no saved results. A separate [2026 multi-asset robustness run](multi-asset-robustness-2026-10-14.md) now uses a verified snapshot and common evaluation dates; it is distinct from the historical notebook study.
 
 ## Before publishing a research claim
 
-Rerun a clean workflow with frozen input data, matching benchmark dates, explicit download settings, and the current corrected metrics. Record any difference from these historical tables rather than replacing their provenance. The diversified ETF experiment remains future work.
+Rerun a clean workflow with frozen input data, matching benchmark dates, explicit download settings, and the current corrected metrics. Record any difference from these historical tables rather than replacing their provenance. The diversified ETF covariance grid is now recorded separately; broader robustness and uncertainty analysis remain future work.
