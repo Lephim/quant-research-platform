@@ -48,29 +48,41 @@ COST_LIST = re.compile(
 )
 
 
-def _comparison_dimensions(question):
-    """Extract explicitly requested comparison arms; leave unspecified choices to Ollama."""
-    if not re.search(r"\b(compare|versus|against|three|two|sweep)\b", question, re.I):
-        return {}
-    dimensions = {}
-    covariance = set()
+
+def _requested_covariance_methods(question):
+    methods = set()
     if re.search(r"\b(sample|ordinary)(?:[- ]+(?:covariance|estimate))?\b", question, re.I):
-        covariance.add("sample")
+        methods.add("sample")
     if re.search(r"\bLedoit[- ]Wolf\b", question, re.I):
-        covariance.add("ledoit_wolf")
-    if len(covariance) > 1:
-        dimensions["covariance_method"] = covariance
-    means = set()
-    if re.search(r"\bhistorical\s+means?\b", question, re.I):
-        means.add("historical")
-    if re.search(r"\bshrunk\s+means?\b", question, re.I):
-        means.add("shrunk")
+        methods.add("ledoit_wolf")
+    return methods
+
+
+def _requested_mean_methods(question):
+    methods = set()
+    for match in re.finditer(
+        r"\b(historical|shrunk)\s+(?:expected\s+returns?|mean(?:s|\s+returns?)?|returns?)\b",
+        question, re.I,
+    ):
+        methods.add(match.group(1).lower())
     if re.search(
         r"\b(?:historical\s+(?:versus|vs\.?|and)\s+shrunk|"
         r"shrunk\s+(?:versus|vs\.?|and)\s+historical)\s+means?\b",
         question, re.I,
     ):
-        means.update(("historical", "shrunk"))
+        methods.update(("historical", "shrunk"))
+    return methods
+
+
+def _comparison_dimensions(question):
+    """Extract explicitly requested comparison arms; leave unspecified choices to Ollama."""
+    if not re.search(r"\b(compare|versus|against|three|two|sweep)\b", question, re.I):
+        return {}
+    dimensions = {}
+    covariance = _requested_covariance_methods(question)
+    if len(covariance) > 1:
+        dimensions["covariance_method"] = covariance
+    means = _requested_mean_methods(question)
     if len(means) > 1:
         dimensions["expected_return_method"] = means
     windows = {int(_first_number(match)) for match in TRAINING_WINDOW.finditer(question)}
@@ -109,7 +121,7 @@ def _comparison_error(question, results):
 
 
 
-def _complete_requested_comparison(question, results, returns, source, max_tool_calls):
+def _complete_requested_comparison(question, results, returns, source, max_tool_calls, calls_used):
     """Fill missing explicit comparison arms using the first completed run's settings."""
     dimensions = _comparison_dimensions(question)
     if not dimensions or not results:
@@ -128,7 +140,7 @@ def _complete_requested_comparison(question, results, returns, source, max_tool_
            for key in common_keys):
         return
     missing = expected - set(actual)
-    if len(results) + len(missing) > max_tool_calls:
+    if calls_used + len(missing) > max_tool_calls:
         return
     for arm in sorted(missing):
         arguments = {**results[0]["strategy"], **dict(zip(keys, arm)),
@@ -210,6 +222,15 @@ def _validate_question_tool_alignment(question, arguments, snapshot_universe=Non
                          f"{arguments.get('universe')}")
     if re.search(r"\bETF(?:s)?\b", question, re.I) and arguments.get("universe") != "multi_asset":
         raise ValueError("ETF basket requests must use the multi_asset universe")
+    covariance = _requested_covariance_methods(question)
+    if covariance and arguments.get("covariance_method", "sample") not in covariance:
+        raise ValueError(f"Tool covariance method {arguments.get('covariance_method', 'sample')} "
+                         f"differs from the requested {sorted(covariance)}")
+    means = _requested_mean_methods(question)
+    if means and arguments.get("expected_return_method", "historical") not in means:
+        raise ValueError(f"Tool expected-return method "
+                         f"{arguments.get('expected_return_method', 'historical')} "
+                         f"differs from the requested {sorted(means)}")
     for pattern, key, converter, label in (
         (TRAINING_WINDOW, "train_window", int, "training window"),
         (REBALANCE, "rebalance_frequency", int, "rebalance frequency"),
@@ -342,7 +363,7 @@ def run_research_agent(question: str, *, snapshot_path=None, model: str | None =
         if not tool_calls:
             if results:
                 _complete_requested_comparison(
-                    question, results, returns, source, max_tool_calls
+                    question, results, returns, source, max_tool_calls, calls
                 )
                 comparison_error = _comparison_error(question, results)
                 if comparison_error:

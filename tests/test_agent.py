@@ -83,7 +83,7 @@ class AgentTests(unittest.TestCase):
                                  "expected_return_method": "historical"}}]
         with patch.object(runner, "run_backtest") as backtest:
             runner._complete_requested_comparison(
-                question, results, "returns", MULTI_SOURCE, 6)
+                question, results, "returns", MULTI_SOURCE, 6, calls_used=0)
         backtest.assert_not_called()
 
     def test_comparison_requires_fixed_other_settings(self):
@@ -196,6 +196,34 @@ class AgentTests(unittest.TestCase):
         arguments["train_window"] = 756
         with self.assertRaisesRegex(ValueError, "training window"):
             runner._validate_question_tool_alignment(question, arguments, "multi_asset")
+
+    def test_explicit_covariance_and_mean_cannot_be_substituted(self):
+        question = ("Run Ledoit-Wolf covariance and shrunk means for the "
+                    "multi_asset universe at 10 bps")
+        arguments = {"universe": "multi_asset", "covariance_method": "sample",
+                     "expected_return_method": "historical",
+                     "transaction_cost_bps": 10}
+        with self.assertRaisesRegex(ValueError, "covariance method"):
+            runner._validate_question_tool_alignment(question, arguments, "multi_asset")
+        arguments["covariance_method"] = "ledoit_wolf"
+        with self.assertRaisesRegex(ValueError, "expected-return method"):
+            runner._validate_question_tool_alignment(question, arguments, "multi_asset")
+        arguments["expected_return_method"] = "shrunk"
+        runner._validate_question_tool_alignment(question, arguments, "multi_asset")
+
+    def test_completion_counts_failed_tool_attempts_in_budget(self):
+        question = "Compare sample and Ledoit-Wolf covariance in multi_asset."
+        results = [{"strategy": {"covariance_method": "sample",
+                                 "expected_return_method": "historical",
+                                 "train_window": 504,
+                                 "rebalance_frequency": 63,
+                                 "max_weight": .3,
+                                 "transaction_cost_bps": 10}}]
+        with patch.object(runner, "run_backtest") as backtest:
+            runner._complete_requested_comparison(
+                question, results, "returns", MULTI_SOURCE, 2, calls_used=2)
+        backtest.assert_not_called()
+        self.assertEqual(len(results), 1)
 
     def test_controlled_covariance_comparison(self):
         def result(**kwargs):
