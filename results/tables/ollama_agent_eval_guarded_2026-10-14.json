@@ -1,0 +1,84 @@
+{
+  "model": "qwen3:8b",
+  "started_at_utc": "2026-10-14T12:49:39.305957+00:00",
+  "cases": [
+    {
+      "id": "paraphrased_pair",
+      "question": "For the diversified ETF basket, compare ordinary sample covariance with Ledoit-Wolf shrinkage. Use historical mean returns, a 504-day lookback, trade every 63 observations, cap positions at 30%, and charge 10 basis points per unit of turnover.",
+      "expected_calls": [
+        {
+          "universe": "multi_asset",
+          "expected_return_method": "historical",
+          "train_window": 504,
+          "rebalance_frequency": 63,
+          "max_weight": 0.3,
+          "transaction_cost_bps": 10.0,
+          "covariance_method": "sample"
+        },
+        {
+          "universe": "multi_asset",
+          "expected_return_method": "historical",
+          "train_window": 504,
+          "rebalance_frequency": 63,
+          "max_weight": 0.3,
+          "transaction_cost_bps": 10.0,
+          "covariance_method": "ledoit_wolf"
+        }
+      ],
+      "actual_calls": [
+        {
+          "universe": "multi_asset",
+          "covariance_method": "sample",
+          "expected_return_method": "historical",
+          "max_weight": 0.3,
+          "rebalance_frequency": 63,
+          "train_window": 504,
+          "transaction_cost_bps": 10
+        },
+        {
+          "covariance_method": "ledoit_wolf",
+          "expected_return_method": "historical",
+          "max_weight": 0.3,
+          "rebalance_frequency": 63,
+          "train_window": 504,
+          "transaction_cost_bps": 10,
+          "universe": "multi_asset"
+        }
+      ],
+      "answer": "Backtest results (values reported directly by the engine):\n\nRun 1: multi_asset\n  covariance_method: sample\n  expected_return_method: historical\n  train_window: 504\n  rebalance_frequency: 63\n  max_weight: 0.3\n  transaction_cost_bps: 10.0\n  Sharpe: 0.5\n  CAGR: 0.05\n\nRun 2: multi_asset\n  covariance_method: ledoit_wolf\n  expected_return_method: historical\n  train_window: 504\n  rebalance_frequency: 63\n  max_weight: 0.3\n  transaction_cost_bps: 10.0\n  Sharpe: 0.52\n  CAGR: 0.05\n\nThese historical results are descriptive, not a significance test. The selected universe and provider data limit interpretation.",
+      "error": null,
+      "elapsed_seconds": 66.456,
+      "calls_match": true,
+      "response_match": true,
+      "passed": true
+    },
+    {
+      "id": "incomplete_request",
+      "question": "Run a backtest.",
+      "expected_calls": [],
+      "actual_calls": [],
+      "answer": "Please specify the universe (equity or multi_asset) and the settings you want to test.",
+      "error": null,
+      "elapsed_seconds": 0.001,
+      "calls_match": true,
+      "response_match": true,
+      "passed": true
+    },
+    {
+      "id": "invalid_window",
+      "question": "Run a multi_asset backtest with sample covariance, historical returns, a 999-observation training window, 63-observation rebalancing, 0.30 max weight, and 10 bps cost.",
+      "expected_calls": [],
+      "actual_calls": [],
+      "answer": "Training window 999 is unsupported. Choose 126, 252, 504, or 756 observations; no backtest was run.",
+      "error": null,
+      "elapsed_seconds": 0.0,
+      "calls_match": true,
+      "response_match": true,
+      "passed": true
+    }
+  ],
+  "complete": true,
+  "finished_at_utc": "2026-10-14T12:50:45.767421+00:00",
+  "passed": 3,
+  "total": 3
+}

@@ -1,22 +1,20 @@
+import pandas as pd
 import yfinance as yf
 
 
 def load_market_data(
-    ticker,
+    tickers,
     start_date,
     end_date
 ):
     """
-    Download historical market data.
+    Download historical market data for one or more tickers.
     """
-
     data = yf.download(
-        ticker,
+        tickers,
         start=start_date,
-        end=end_date
+        end=end_date,
+        auto_adjust=True
     )
-
-    if isinstance(data.columns, tuple):
-        data.columns = data.columns.droplevel(1)
 
     return data

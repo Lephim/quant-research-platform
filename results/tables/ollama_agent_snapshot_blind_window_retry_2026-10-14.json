@@ -1,0 +1,55 @@
+{
+  "model": "qwen3:8b",
+  "started_at_utc": "2026-10-14T13:16:23.979770+00:00",
+  "case_source_sha256": "09471cbdaca22f751f3fbe7de9956e708dcc70400fccc3633455c9d79dd3cb39",
+  "snapshot_sha256": "d87df74b9c463a5e7a82ebe66634b9025578f8451c372f80390f387fc9ef9d10",
+  "snapshot": "/Users/himankarsharma/Documents/quant-research-platform/data/snapshots/multi_asset_2018-2024_2026-10-14.csv",
+  "cases": [
+    {
+      "id": "window_pair",
+      "question": "How do 252 versus 504 training observations compare for multi_asset using sample covariance? Keep historical means, 63-observation rebalancing, a 30% cap, and 10 bps cost.",
+      "expected_calls": [
+        {
+          "universe": "multi_asset",
+          "covariance_method": "sample",
+          "expected_return_method": "historical",
+          "train_window": 252,
+          "rebalance_frequency": 63,
+          "max_weight": 0.3,
+          "transaction_cost_bps": 10.0
+        },
+        {
+          "universe": "multi_asset",
+          "covariance_method": "sample",
+          "expected_return_method": "historical",
+          "train_window": 504,
+          "rebalance_frequency": 63,
+          "max_weight": 0.3,
+          "transaction_cost_bps": 10.0
+        }
+      ],
+      "actual_calls": [
+        {
+          "covariance_method": "sample",
+          "expected_return_method": "historical",
+          "max_weight": 0.3,
+          "rebalance_frequency": 63,
+          "train_window": 504,
+          "transaction_cost_bps": 10,
+          "universe": "multi_asset"
+        }
+      ],
+      "same_returns_object": true,
+      "answer": "Backtest results (values reported directly by the engine):\nSnapshot: multi_asset_2018-2024_2026-10-14.csv\nSHA-256: d87df74b9c463a5e7a82ebe66634b9025578f8451c372f80390f387fc9ef9d10\nPrice dates: 2018-01-02 to 2024-12-31\n\nRun 1: multi_asset\n  covariance_method: sample\n  expected_return_method: historical\n  train_window: 504\n  rebalance_frequency: 63\n  max_weight: 0.3\n  transaction_cost_bps: 10.0\n  Sharpe: 0.5\n  CAGR: 0.05\n\nThese historical results are descriptive, not a significance test. The selected universe and execution model limit interpretation.",
+      "error": null,
+      "elapsed_seconds": 100.712,
+      "calls_match": false,
+      "response_match": false,
+      "passed": false
+    }
+  ],
+  "complete": true,
+  "finished_at_utc": "2026-10-14T13:18:04.697151+00:00",
+  "passed": 0,
+  "total": 1
+}

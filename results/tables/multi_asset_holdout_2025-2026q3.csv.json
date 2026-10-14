@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "plan": "docs/multi-asset-holdout-plan-2026-10-14.md",
+  "snapshot_path": "/Users/himankarsharma/Documents/quant-research-platform/data/snapshots/multi_asset_2018-2026q3_2026-10-14.csv",
+  "snapshot_sha256": "96670e1733d98bbb49b5bce60827c3e4ff20deddc9e0af12d751f878fe78336f",
+  "summary_sha256": "3a518ded84cc0c2d2b74dad6c3ee3cd3a8461bd9486a38e93b6a0dcb6361bccf",
+  "daily_returns_sha256": "063abded3e8a3fe126d0f71a89a9d41ea6f7e3fe1668789aa80564d892a61f9b",
+  "holdout_start_requested": "2025-01-01",
+  "evaluation_start": "2025-01-02",
+  "evaluation_end": "2026-09-30",
+  "evaluation_days": 437,
+  "train_window": 756,
+  "rebalance_frequency": 63,
+  "max_weight": 0.3,
+  "transaction_cost_bps": 10.0,
+  "expected_return_method": "historical",
+  "risk_free_rate": 0.0
+}

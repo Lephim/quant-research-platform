@@ -1,0 +1,91 @@
+{
+  "model": "qwen3:8b",
+  "started_at_utc": "2026-10-14T13:45:31.711245+00:00",
+  "case_source_sha256": "18f5b185517f3fecbd8dd7f9a142e224594119a42ea687f9d91317f7e14dedb0",
+  "snapshot_sha256": "d87df74b9c463a5e7a82ebe66634b9025578f8451c372f80390f387fc9ef9d10",
+  "snapshot": "/Users/himankarsharma/Documents/quant-research-platform/data/snapshots/multi_asset_2018-2024_2026-10-14.csv",
+  "cases": [
+    {
+      "id": "covariance_mean_grid",
+      "question": "Compare all four combinations of sample versus Ledoit-Wolf covariance and historical versus shrunk means in multi_asset. Hold 504 training observations, 63-observation rebalancing, 30% max weight, and 10 bps cost fixed.",
+      "expected_calls": [
+        {
+          "universe": "multi_asset",
+          "covariance_method": "sample",
+          "expected_return_method": "historical",
+          "train_window": 504,
+          "rebalance_frequency": 63,
+          "max_weight": 0.3,
+          "transaction_cost_bps": 10.0
+        },
+        {
+          "universe": "multi_asset",
+          "covariance_method": "sample",
+          "expected_return_method": "shrunk",
+          "train_window": 504,
+          "rebalance_frequency": 63,
+          "max_weight": 0.3,
+          "transaction_cost_bps": 10.0
+        },
+        {
+          "universe": "multi_asset",
+          "covariance_method": "ledoit_wolf",
+          "expected_return_method": "historical",
+          "train_window": 504,
+          "rebalance_frequency": 63,
+          "max_weight": 0.3,
+          "transaction_cost_bps": 10.0
+        },
+        {
+          "universe": "multi_asset",
+          "covariance_method": "ledoit_wolf",
+          "expected_return_method": "shrunk",
+          "train_window": 504,
+          "rebalance_frequency": 63,
+          "max_weight": 0.3,
+          "transaction_cost_bps": 10.0
+        }
+      ],
+      "actual_calls": [
+        {
+          "transaction_cost_bps": 10,
+          "universe": "multi_asset",
+          "covariance_method": "sample",
+          "expected_return_method": "historical",
+          "train_window": 504,
+          "rebalance_frequency": 63,
+          "max_weight": 0.3
+        },
+        {
+          "covariance_method": "sample",
+          "expected_return_method": "shrunk",
+          "train_window": 504,
+          "rebalance_frequency": 63,
+          "max_weight": 0.3,
+          "transaction_cost_bps": 10,
+          "universe": "multi_asset"
+        },
+        {
+          "rebalance_frequency": 63,
+          "max_weight": 0.3,
+          "transaction_cost_bps": 10,
+          "universe": "multi_asset",
+          "covariance_method": "ledoit_wolf",
+          "expected_return_method": "historical",
+          "train_window": 504
+        }
+      ],
+      "same_returns_object": true,
+      "answer": "Comparison incomplete or invalid: requested configurations 4, completed runs 3; missing [('ledoit_wolf', 'shrunk')], unexpected [], duplicate runs 0. No comparative results were reported.",
+      "error": null,
+      "elapsed_seconds": 99.51,
+      "calls_match": false,
+      "response_match": false,
+      "passed": false
+    }
+  ],
+  "complete": true,
+  "finished_at_utc": "2026-10-14T13:47:11.222400+00:00",
+  "passed": 0,
+  "total": 1
+}
